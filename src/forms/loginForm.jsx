@@ -9,21 +9,18 @@ const LoginForm = ({ onSubmit, error }) => {
       {
         label: "Phone number",
         name: "username",
+        schema: Joi.string()
+          .required()
+          .regex(/^01[3-9][ ]?[0-9]{2}[ ]?[0-9]{3}[ ]?[0-9]{3}$/, "Phone")
+          .label("Phone number"),
       },
       {
         label: "Password",
         name: "password",
         type: "password",
+        schema: Joi.string().required().label("Password"),
       },
     ],
-  };
-
-  const shema = {
-    username: Joi.string()
-      .required()
-      .regex(/^01[3-9][ ]?[0-9]{2}[ ]?[0-9]{3}[ ]?[0-9]{3}$/, "Phone")
-      .label("Phone number"),
-    password: Joi.string().required().label("Password"),
   };
 
   function handleSubmit(event) {
@@ -44,7 +41,7 @@ const LoginForm = ({ onSubmit, error }) => {
       {/* <h3 className="text-center">Sign in</h3> */}
       <div className="p-3">
         <span className="form-text text-danger text-center">{error}</span>
-        <Form formData={formData} shema={shema} onSubmit={handleSubmit} />
+        <Form formData={formData} onSubmit={handleSubmit} />
       </div>
     </div>
   );

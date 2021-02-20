@@ -3,7 +3,7 @@ import Options from "./Option";
 import Input from "./input";
 import Joi from "joi-browser";
 
-const Form = ({ formData, shema, onSubmit }) => {
+const Form = ({ formData, onSubmit }) => {
   const [values, setValues] = useState({});
   const [errors, setError] = useState({});
 
@@ -21,7 +21,8 @@ const Form = ({ formData, shema, onSubmit }) => {
 
   const validateProperty = ({ name, value }) => {
     const obj = { [name]: value };
-    const schemaP = { [name]: shema[name] };
+    const shema = formData.fields.find((fd) => fd.name == name).schema;
+    const schemaP = { [name]: shema };
     const { error } = Joi.validate(obj, schemaP);
     if (!error) return null;
     return error ? error.details[0].message : null;
@@ -29,13 +30,20 @@ const Form = ({ formData, shema, onSubmit }) => {
 
   const validate = () => {
     const options = { abortEarly: false };
-    const { error } = Joi.validate(values, shema, options);
+    const vShema = {};
+
+    formData.fields.forEach((fd) => {
+      vShema[fd.name] = fd.schema;
+    });
+
+    const { error } = Joi.validate(values, vShema, options);
     if (!error) return null;
 
     const errors = {};
     for (let item of error.details) {
       errors[item.path[0]] = item.message;
     }
+
     return errors;
   };
 
@@ -84,12 +92,3 @@ const Form = ({ formData, shema, onSubmit }) => {
   );
 };
 export default Form;
-{
-  /* <Field
-                key={field.name}
-                field={field}
-                type={field.type}
-                fieldChanged={fieldChanged}
-                value={data[field.name]}
-              /> */
-}
