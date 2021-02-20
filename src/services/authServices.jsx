@@ -1,13 +1,18 @@
-import http from "./httpService";
 import {
-  getCookie,
-  setCookie,
   getAllCookie,
+  getCookie,
   removeCookie,
+  setCookie,
 } from "./cookieService";
+import http from "./httpService";
 
 const apiEndpoint =
   "/oauth/token?grant_type=password&client_id=ship_client&client_secret=ship_secret&";
+
+const ACCESS_TOKEN_KEY = "access_token";
+const REFRESH_TOKEN_KEY = "refresh_token";
+const USER_KEY = "user";
+const AUTHORITY_KEY = "authority";
 
 export async function login(username, password) {
   const url = apiEndpoint + `username=${username}&password=${password}`;
@@ -15,25 +20,36 @@ export async function login(username, password) {
   saveToken(data);
 }
 
-export function getCurrentUser() {
-  const user = getCookie("user");
-  return user;
-}
-
-export function isAuthenticated() {
-  const access_token = getCookie("access_token");
-  return !!access_token;
-}
-
 export function logout() {
-  console.log("logout module");
   const allCookies = getAllCookie();
-  console.log("allCookies", allCookies);
   Object.keys(allCookies).map((m) => {
     removeCookie(m);
   });
   window.location = "/";
 }
+
+export function getCurrentUser() {
+  const user = getCookie(USER_KEY);
+  return user;
+}
+
+export function hasAuthority(roles) {
+  const userRoles = getCookie(AUTHORITY_KEY);
+  for (let ro of roles) {
+    for (let ur of userRoles) {
+      if (ur === ro) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+export function isAuthenticated() {
+  const access_token = getCookie(ACCESS_TOKEN_KEY);
+  return !!access_token;
+}
+
 function saveToken(data) {
   const user = {
     id: data.id,
@@ -49,16 +65,17 @@ function saveToken(data) {
   var expires = new Date();
   expires.setSeconds(expires.getSeconds() + data.expires_in);
 
-  setCookie("access_token", data.access_token, { expires });
-  setCookie("refresh_token", data.refresh_token);
-  setCookie("user", user);
-  setCookie("authority", authority);
+  setCookie(ACCESS_TOKEN_KEY, data.access_token, { expires });
+  setCookie(REFRESH_TOKEN_KEY, data.refresh_token);
+  setCookie(USER_KEY, user);
+  setCookie(AUTHORITY_KEY, authority);
 }
 
 export default {
-  login,
   getCurrentUser,
+  hasAuthority,
   isAuthenticated,
+  login,
   logout,
 };
 
