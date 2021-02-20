@@ -8,7 +8,7 @@ $primary-text-color: #212121;
 $secondary-text-color: #757575;
 $divider-color: #bdbdbd;
 
-.navbar {
+.homeNavbar {
   color: $primary-color-text;
   background: $primary-color;
   font-weight: 700;
@@ -22,10 +22,10 @@ $divider-color: #bdbdbd;
   border-color: hsla(0, 0%, 100%, 0.1);
 }
 
-.nav-link {
+.homeNavbar .nav-link {
   color: $primary-color-text !important;
 }
-.nav-link:hover {
+.homeNavbar .nav-link:hover {
   color: $secondary-text-color !important;
   background: $primary-color-text;
 }

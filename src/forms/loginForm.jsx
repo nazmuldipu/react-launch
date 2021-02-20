@@ -2,16 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Form from "../ui/forms/form";
 import Joi from "joi-browser";
-import auth from "../services/authServices";
 
-// import { renderInput } from "../ui/forms/form";
-
-const LoginForm = ({ path }) => {
+const LoginForm = ({ onSubmit, error }) => {
   const formData = {
     fields: [
       {
         label: "Phone number",
-        name: "phonenumber",
+        name: "username",
       },
       {
         label: "Password",
@@ -22,26 +19,15 @@ const LoginForm = ({ path }) => {
   };
 
   const shema = {
-    phonenumber: Joi.string()
+    username: Joi.string()
       .required()
       .regex(/^01[3-9][ ]?[0-9]{2}[ ]?[0-9]{3}[ ]?[0-9]{3}$/, "Phone")
       .label("Phone number"),
     password: Joi.string().required().label("Password"),
   };
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   const errors = this.validate();
-  //   this.setState({ errors: errors || {} });
-  //   if (errors) return;
-
-  //   this.doSubmit();
-  // };
-  
-
-  async function handleSubmit(event) {
-    console.log(event);
-    await auth.login(event.phonenumber, event.password);
+  function handleSubmit(event) {
+    onSubmit(event);
   }
 
   return (
@@ -57,6 +43,7 @@ const LoginForm = ({ path }) => {
 
       {/* <h3 className="text-center">Sign in</h3> */}
       <div className="p-3">
+        <span className="form-text text-danger text-center">{error}</span>
         <Form formData={formData} shema={shema} onSubmit={handleSubmit} />
       </div>
     </div>
