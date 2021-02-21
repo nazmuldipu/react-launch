@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Form from "../ui/forms/form";
 import Joi from "joi-browser";
 
 const ShipForm = ({ onSubmit, error }) => {

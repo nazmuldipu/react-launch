@@ -1,29 +1,33 @@
 import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
-import LoginForm from "../forms/loginForm";
+
+import userService from "../services/userService";
 import LoginContent from "./../components/loginContent";
-import auth from "../services/authServices";
+import RegistrationForm from "./../forms/registrationForm";
 import Loading from "./../ui/loading";
 
-const LoginPage = ({ location }) => {
-  const [errorMessage, setErrorMessage] = useState("");
+const RegistrationPage = () => {
   const [loading, setLoading] = useState(false);
-  const history = useHistory();
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function handleSubmit(event) {
-    const path = location.state ? location.state.from.pathname : "/dashboard";
     try {
       setErrorMessage("");
       setLoading(true);
-      await auth.login(event.username, event.password);
+      const resp = await userService.register(event);
       setLoading(false);
-      history.push(path);
+      console.log(resp);
+      useHistory.push("/login");
     } catch (ex) {
       setLoading(false);
       if (!ex.response) {
         setErrorMessage("Network connection error");
       } else if (ex.response && ex.response.status === 400) {
         setErrorMessage(ex.response.data.error_description);
+      } else {
+        setErrorMessage(
+          ex.response.status + ": " + ex.response.data.error_description
+        );
       }
     }
   }
@@ -41,7 +45,10 @@ const LoginPage = ({ location }) => {
               {loading ? (
                 <Loading />
               ) : (
-                <LoginForm onSubmit={handleSubmit} error={errorMessage} />
+                <RegistrationForm
+                  onSubmit={handleSubmit}
+                  error={errorMessage}
+                />
               )}
             </div>
           </div>
@@ -51,4 +58,4 @@ const LoginPage = ({ location }) => {
   );
 };
 
-export default LoginPage;
+export default RegistrationPage;

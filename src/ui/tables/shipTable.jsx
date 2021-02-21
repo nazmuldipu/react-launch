@@ -26,10 +26,10 @@ const ShipTable = ({ ships }) => {
       key: "like",
       content: (ship) => (
         <React.Fragment>
-          <div class="btn-group btn-group-sm" role="group" >
-            <Link class="btn btn-outline-info btn-sm" to={"/dashboar/ships/" + ship.id}>Details</Link>
-            <Link class="btn btn-outline-info btn-sm" to={"/dashboar/category-add" + ship.id}>Add Category</Link>
-            <Link class="btn btn-outline-info btn-sm" to={"/dashboar/seat-add" + ship.id}>Add Seat</Link>
+          <div className="btn-group btn-group-sm" role="group" >
+            <Link className="btn btn-outline-info btn-sm" to={"/dashboar/ships/" + ship.id}>Details</Link>
+            <Link className="btn btn-outline-info btn-sm" to={"/dashboar/category-add" + ship.id}>Add Category</Link>
+            <Link className="btn btn-outline-info btn-sm" to={"/dashboar/seat-add" + ship.id}>Add Seat</Link>
           </div>
         </React.Fragment>
       ),

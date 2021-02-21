@@ -8,6 +8,7 @@ import HomePage from "./containers/homePage";
 import LoginPage from "./containers/loginPage";
 import NotFound from "./containers/notFound";
 import ProtectedRoute from "./services/protectedRoutes";
+import RegistrationPage from "./containers/registrationPage";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Switch>
         <ProtectedRoute path="/dashboard" component={DashboardRouter} />
         <Route path="/login" component={LoginPage} />
+        <Route path="/register" component={RegistrationPage} />
         <Route path="/not-found" component={NotFound} />
         <Route exact path="/" component={HomePage} />
         <Redirect to="/not-found" />

@@ -4,14 +4,14 @@ import { Link } from "react-router-dom";
 
 import useForm from "./../ui/forms/useForm";
 
-const LoginForm = ({ onSubmit, error }) => {
+const RegistrationForm = ({ onSubmit, error }) => {
   const schema = {
-    username: Joi.string()
-      .required()
-      .regex(/^01[3-9][ ]?[0-9]{2}[ ]?[0-9]{3}[ ]?[0-9]{3}$/, "Phone")
-      .label("Phone number"),
+    name: Joi.string().required().label("Name"),
+    email: Joi.string().email().label("Email"),
+    username: Joi.string().required().label("Phone Number"),
     password: Joi.string().required().label("Password"),
   };
+
   const { data, renderInput, renderButton, validateSubmit } = useForm({
     schema,
   });
@@ -26,18 +26,18 @@ const LoginForm = ({ onSubmit, error }) => {
   return (
     <div className="bg-light pb-3">
       <div className="d-flex btn-group">
-        <Link className="btn btn-primary flex-fill" to="/login">
+        <Link className="btn btn-secondary flex-fill" to="/login">
           Sign in
         </Link>
-        <Link className="btn btn-secondary flex-fill" to="/register">
+        <Link className="btn btn-primary flex-fill" to="/register">
           Register
         </Link>
       </div>
 
-      {/* <h3 className="text-center">Sign in</h3> */}
       <div className="p-3">
         <span className="form-text text-danger text-center">{error}</span>
         <form onSubmit={handleSubmit}>
+          {renderInput("name", "Name")}
           {renderInput("username", "Phone Number")}
           {renderInput("password", "Password", "password")}
           {renderButton("Register")}
@@ -47,4 +47,4 @@ const LoginForm = ({ onSubmit, error }) => {
   );
 };
 
-export default LoginForm;
+export default RegistrationForm;
