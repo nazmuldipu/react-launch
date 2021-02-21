@@ -24,9 +24,10 @@ const ShipAdd = () => {
   }
 
   return (
-    <React.Fragment>
+    <div className="container">
+      <h3 className="text-center">Ship Form</h3>
       <ShipForm onSubmit={handleSubmit} error={errorMessage} />
-    </React.Fragment>
+    </div>
   );
 };
 

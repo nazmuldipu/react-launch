@@ -9,6 +9,9 @@ import http from "./httpService";
 const apiEndpoint =
   "/oauth/token?grant_type=password&client_id=ship_client&client_secret=ship_secret&";
 
+const ACCESS_TOKEN_BY_REFRESH_TOKEN_URL =
+  "/oauth/token?grant_type=refresh_token&client_id=ship_client&client_secret=ship_secret&";
+
 const ACCESS_TOKEN_KEY = "access_token";
 const REFRESH_TOKEN_KEY = "refresh_token";
 const USER_KEY = "user";
@@ -20,13 +23,24 @@ export async function login(username, password) {
   saveToken(data);
 }
 
+const obtainAccessToken = async (refresh_token) => {
+  const url =
+    ACCESS_TOKEN_BY_REFRESH_TOKEN_URL + `refresh_token=${refresh_token}`;
+  const { data } = await http.get(url);
+  saveAaccess_token(data);
+};
+
 export function logout() {
+  removeAllCookie();
+  window.location = "/";
+}
+
+const removeAllCookie = () => {
   const allCookies = getAllCookie();
   Object.keys(allCookies).map((m) => {
     removeCookie(m);
   });
-  window.location = "/";
-}
+};
 
 export function getCurrentUser() {
   const user = getCookie(USER_KEY);
@@ -35,6 +49,9 @@ export function getCurrentUser() {
 
 export function hasAuthority(roles) {
   const userRoles = getCookie(AUTHORITY_KEY);
+  
+  if (!userRoles) logout();
+
   for (let ro of roles) {
     for (let ur of userRoles) {
       if (ur === ro) {
@@ -45,10 +62,27 @@ export function hasAuthority(roles) {
   return false;
 }
 
-export function isAuthenticated() {
+export async function isAuthenticated() {
   const access_token = getCookie(ACCESS_TOKEN_KEY);
-  return !!access_token;
+  if (access_token) {
+    return true;
+  } else {
+    const refresh_token = getCookie("refresh_token");
+    if (refresh_token) {
+      await obtainAccessToken(refresh_token);
+      const token = getCookie(ACCESS_TOKEN_KEY);
+      return !!token;
+    }
+  }
+  removeAllCookie();
+  return false;
 }
+
+const saveAaccess_token = (data) => {
+  var expires = new Date();
+  expires.setSeconds(expires.getSeconds() + data.expires_in);
+  setCookie(ACCESS_TOKEN_KEY, data.access_token, { expires });
+};
 
 function saveToken(data) {
   const user = {
@@ -62,13 +96,15 @@ function saveToken(data) {
   };
 
   const authority = data.authorities.map((au) => au.authority);
-  var expires = new Date();
-  expires.setSeconds(expires.getSeconds() + data.expires_in);
 
-  setCookie(ACCESS_TOKEN_KEY, data.access_token, { expires });
-  setCookie(REFRESH_TOKEN_KEY, data.refresh_token);
-  setCookie(USER_KEY, user);
-  setCookie(AUTHORITY_KEY, authority);
+  removeAllCookie();
+  saveAaccess_token(data);
+
+  var expires = new Date();
+  expires.setDate(expires.getDate() + 7);
+  setCookie(REFRESH_TOKEN_KEY, data.refresh_token, { expires });
+  setCookie(USER_KEY, user, { expires });
+  setCookie(AUTHORITY_KEY, authority, { expires });
 }
 
 export default {

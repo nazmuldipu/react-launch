@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Joi from "joi-browser";
 import Input from "./input";
+import Select from './select';
 
 const useForm = ({ schema }) => {
   const [data, setData] = useState({});
@@ -59,6 +60,19 @@ const useForm = ({ schema }) => {
     );
   };
 
+  const renderSelect = (name, label, options) => {
+    return (
+      <Select
+        name={name}
+        value={data[name]}
+        label={label}
+        options={options}
+        onChange={handleChange}
+        error={errors[name]}
+      />
+    );
+  };
+
   const renderButton = (label) => {
     return (
       <button disabled={validateForm()} className="btn btn-sm btn-primary">
@@ -72,7 +86,8 @@ const useForm = ({ schema }) => {
     validateSubmit,
     validateForm,
     renderInput,
-    renderButton
+    renderSelect,
+    renderButton,
   };
 };
 
