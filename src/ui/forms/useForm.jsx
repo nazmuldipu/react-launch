@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import Joi from "joi-browser";
 import Input from "./input";
-import Select from './select';
+import Select from "./select";
+import CheckBox from "./checkBox";
 
 const useForm = ({ schema }) => {
   const [data, setData] = useState({});
   const [errors, setErrors] = useState({});
 
   const handleChange = ({ currentTarget: input }) => {
+    if (input.type == "checkbox") input.value = input.checked;
+
     const faults = { ...errors };
     const errorMessage = validateProperty(input);
     if (errorMessage) faults[input.name] = errorMessage;
@@ -15,7 +18,17 @@ const useForm = ({ schema }) => {
     setErrors(faults);
 
     const formData = { ...data };
-    formData[input.name] = input.value;
+    switch (input.type) {
+      case "checkbox":
+        formData[input.name] = JSON.parse(input.value);
+        break;
+      case "number":
+        formData[input.name] = Number(input.value);
+        break;
+
+      default:
+        formData[input.name] = input.value;
+    }
     setData(formData);
   };
 
@@ -60,6 +73,18 @@ const useForm = ({ schema }) => {
     );
   };
 
+  const renderCheckBox = (name, label) => {
+    return (
+      <CheckBox
+        name={name}
+        value={data[name] || ""}
+        label={label}
+        onChange={handleChange}
+        error={errors[name]}
+      />
+    );
+  };
+
   const renderSelect = (name, label, options) => {
     return (
       <Select
@@ -87,6 +112,7 @@ const useForm = ({ schema }) => {
     validateForm,
     renderInput,
     renderSelect,
+    renderCheckBox,
     renderButton,
   };
 };

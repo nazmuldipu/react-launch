@@ -8,8 +8,9 @@ axios.interceptors.response.use(null, (error) => {
     error.response.status >= 400 &&
     error.response.status < 500;
   if (!expectedError) {
-    console.log("Logging the error", error.response.status, error);
+    console.log("Logging the error", error);
     alert("An unexpected error occurred.");
+    // window.location = "/login";
   }
   return Promise.reject(error);
 });

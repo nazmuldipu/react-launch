@@ -1,7 +1,8 @@
 import Joi from "joi-browser";
-import React from "react";
+import React, { useState } from "react";
 
 import useForm from "./../ui/forms/useForm";
+import ShipFacilityForm from "./shipFacilityForm";
 
 const ShipForm = ({ onSubmit, error }) => {
   const schema = {
@@ -21,12 +22,21 @@ const ShipForm = ({ onSubmit, error }) => {
       .regex(/^01[3-9][ ]?[0-9]{2}[ ]?[0-9]{3}[ ]?[0-9]{3}$/, "Phone")
       .label("Ship contact person phone number"),
     description: Joi.string().required().label("Ship kids poilicy"),
+    discount: Joi.number().required().label("Discount"),
+    hotelswaveCommission: Joi.number()
+      .required()
+      .label("Hotelswave Commission"),
+    priority: Joi.number().required().label("Priority"),
+    ac: Joi.boolean(),
+    containCabin: Joi.boolean(),
+    online: Joi.boolean(),
   };
 
   const {
     data,
     renderInput,
     renderSelect,
+    renderCheckBox,
     renderButton,
     validateSubmit,
   } = useForm({
@@ -52,18 +62,23 @@ const ShipForm = ({ onSubmit, error }) => {
     { id: "TEKNAF", name: "Teknaf" },
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e, facilities) => {
     e.preventDefault();
     if (validateSubmit(e)) {
-      onSubmit(data);
+      const value = { ...data, shipFacilities: { ...facilities } };
+      onSubmit(value);
     }
   };
 
+  const onSubmitFacility = (e, facilities) => {
+    handleSubmit(e, facilities);
+  };
+
   return (
-    <div className="bg-light pb-3">
+    <div className="bg-light pb-2 mb-4">
       <div className="p-3">
         <span className="form-text text-danger text-center">{error}</span>
-        <form onSubmit={handleSubmit}>
+        <form>
           <div className="row">
             <div className="col-md-6">
               {renderInput("shipNumber", "Ship Number", "number")}
@@ -87,9 +102,45 @@ const ShipForm = ({ onSubmit, error }) => {
             <div className="col-md-4">
               {renderInput("startTime", "Ship Start Time")}
             </div>
+            <div className="col-md-4">
+              {renderInput("floor", "No of floon in Ship", "number")}
+            </div>
+            <div className="col-md-4">
+              {renderInput("size", "Ship size in sqm", "number")}
+            </div>
+            <div className="col-md-4">
+              {renderInput("phoneNumber", "Ship contact person phone number")}
+            </div>
+            <div className="col-md-4">
+              {renderInput("discount", "Discount", "number")}
+            </div>
+            <div className="col-md-4">
+              {renderInput(
+                "hotelswaveCommission",
+                "Hotelswave Commission",
+                "number"
+              )}
+            </div>
+            <div className="col-md-4">
+              {renderInput("priority", "Priority", "number")}
+            </div>
+            <div className="col-12">
+              {renderInput("kidsPolicy", "Ship kids policy")}
+            </div>
+            <div className="col-12">
+              {renderInput("description", "Ship description")}
+            </div>
+
+            <div className="col-4 col-md-2">{renderCheckBox("ac", "Ac")}</div>
+            <div className="col-4 col-md-2">
+              {renderCheckBox("containCabin", "Contain Cabin")}
+            </div>
+            <div className="col-4 col-md-2">
+              {renderCheckBox("online", "Online")}
+            </div>
           </div>
-          {renderButton("Save")}
         </form>
+        <ShipFacilityForm onSubmit={onSubmitFacility} error={error} />
       </div>
     </div>
   );

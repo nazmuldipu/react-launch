@@ -19,3 +19,14 @@ code {
 .dash-logo {
   height: 45px;
 }
+.ship-icon {
+  height: 30px;
+  padding-right: 12px;
+}
+.clickable {
+  cursor: pointer;
+}
+.btn-sm {
+  padding: 0.15rem 0.25rem !important;
+  line-height: 1.4 !important;
+}

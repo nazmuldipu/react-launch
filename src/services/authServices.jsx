@@ -26,14 +26,26 @@ export async function login(username, password) {
 const obtainAccessToken = async (refresh_token) => {
   const url =
     ACCESS_TOKEN_BY_REFRESH_TOKEN_URL + `refresh_token=${refresh_token}`;
-  const { data } = await http.get(url);
-  saveAaccess_token(data);
+  try {
+    const { data } = await http.get(url);
+    console.log(data);
+    saveAaccess_token(data);
+  } catch (err) {
+    logout();
+    console.log(err);
+    console.log(err.status);
+  }
 };
 
 export function logout() {
   removeAllCookie();
   window.location = "/";
 }
+
+export const getAccessToken = () => {
+  if (isAuthenticated()) return getCookie(ACCESS_TOKEN_KEY);
+  return null;
+};
 
 const removeAllCookie = () => {
   const allCookies = getAllCookie();
@@ -49,8 +61,7 @@ export function getCurrentUser() {
 
 export function hasAuthority(roles) {
   const userRoles = getCookie(AUTHORITY_KEY);
-  
-  if (!userRoles) logout();
+  if (!userRoles) return false;
 
   for (let ro of roles) {
     for (let ur of userRoles) {
@@ -62,19 +73,21 @@ export function hasAuthority(roles) {
   return false;
 }
 
-export async function isAuthenticated() {
+export const getAuthority = () => {
+  if (isAuthenticated()) return getCookie(AUTHORITY_KEY);
+  else return ["ROLE_USER"];
+};
+
+export function isAuthenticated() {
   const access_token = getCookie(ACCESS_TOKEN_KEY);
+  const refresh_token = getCookie("refresh_token");
+
   if (access_token) {
     return true;
-  } else {
-    const refresh_token = getCookie("refresh_token");
-    if (refresh_token) {
-      await obtainAccessToken(refresh_token);
-      const token = getCookie(ACCESS_TOKEN_KEY);
-      return !!token;
-    }
+  } else if (refresh_token) {
+    obtainAccessToken(refresh_token);
+    return true;
   }
-  removeAllCookie();
   return false;
 }
 
@@ -109,6 +122,8 @@ function saveToken(data) {
 
 export default {
   getCurrentUser,
+  getAccessToken,
+  getAuthority,
   hasAuthority,
   isAuthenticated,
   login,

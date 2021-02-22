@@ -1,32 +1,48 @@
 import http from "./httpService";
+import auth from "./authServices";
 
 const apiEndpoint = "api/v1/ships";
+const adminEndpoint = "api/v1/admin/ships";
 
-function movieUrl(id) {
-  return `${apiEndpoint}/${id}`;
-}
-export function getAllShip(page = 0) {
+const getUrlFor = (reqAuth, path, param) => {
+  if (!reqAuth) return apiEndpoint;
+
+  const role = auth.getAuthority();
+  switch (role[0]) {
+    case "ROLE_ADMIN":
+      return (
+        adminEndpoint + `${path}?access_token=${auth.getAccessToken()}&${param}`
+      );
+    default:
+      return apiEndpoint;
+  }
+};
+
+export const getAllShip = (page = 0) => {
   const param = `page=${page}&`;
   return http.get(apiEndpoint + `?${param}`);
-}
+};
 
-export function saveMovie(movie) {
-  if (movie._id) {
-    const body = { ...movie };
-    delete body._id;
-    return http.put(movieUrl(movie._id), body);
-  }
-  return http.post(apiEndpoint, movie);
-}
+export const saveShip = (ship) => {
+  const url = getUrlFor(true, null, null);
+  if (url) return http.post(url, ship);
+  return null;
+};
 
-export function getMovies() {
-  return http.get(apiEndpoint);
-}
+export const getShipMap = (id, startDate, endDate) => {
+  const param = `startDate=${startDate}&endDate=${endDate}&`;
+  const url = getUrlFor(true, `/shipMap/${id}`, param);
+  return http.get(url);
+};
 
-export function getMovie(id) {
-  return http.get(movieUrl(id));
-}
+export const updateMap = (id, date, value) => {
+  const param = `date=${date}&value=${value}&`;
+  const url = getUrlFor(true, `/updateMap/${id}`, param);
+  return http.put(url);
+};
 
-export function deleteMovie(id) {
-  return http.delete(movieUrl(id));
-}
+export default {
+  getAllShip,
+  getShipMap,
+  saveShip,
+};
